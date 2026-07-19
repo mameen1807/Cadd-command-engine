@@ -12,10 +12,10 @@ st.set_page_config(
 )
 
 # ==========================================
-# 2. SIDEBAR CONTROL & PREFERENCES PANEL (Cleaned Up)
+# 2. SIDEBAR CONTROL & PREFERENCES PANEL
 # ==========================================
 with st.sidebar:
-    st.markdown('<h2 style="color: #38BDF8; font-family: monospace; margin-bottom: 5px;">⚙️ STUDIO CONTROL</h2>', unsafe_allow_html=True)
+    st.title("⚙️ STUDIO CONTROL")
     st.markdown("---")
     
     ui_theme = st.selectbox(
@@ -30,7 +30,7 @@ with st.sidebar:
     )
 
 # ==========================================
-# 3. DYNAMIC WORKSPACE STYLING INJECTION
+# 3. DYNAMIC WORKSPACE STYLING INJECTION (Safe UI)
 # ==========================================
 if ui_theme == "Dark Matte Studio":
     st.markdown("""
@@ -41,9 +41,6 @@ if ui_theme == "Dark Matte Studio":
                               linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 0);
             background-size: 32px 32px;
         }
-        label, p, span, h1, h2, h3, div { color: #E2E8F0 !important; }
-        .stTextInput input, .stSelectbox div { background-color: #151922 !important; border: 1px solid #222936 !important; color: #E2E8F0 !important; }
-        .description-text { color: #94A3B8 !important; }
         </style>
         """, unsafe_allow_html=True)
 else:
@@ -55,14 +52,11 @@ else:
                               linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 0);
             background-size: 24px 24px;
         }
-        label, p, span, h1, h2, h3, div { color: #0F172A !important; }
-        .stTextInput input, .stSelectbox div { background-color: #FFFFFF !important; border: 1px solid #CBD5E1 !important; color: #0F172A !important; }
-        .description-text { color: #475569 !important; }
         </style>
         """, unsafe_allow_html=True)
 
 # ==========================================
-# 4. DATABASE LOADING & STRUCTURAL RE-MAPPING
+# 4. DATABASE LOADING & ULTRA-SAFE KEY EXTRACTOR
 # ==========================================
 try:
     with open("commands.json", "r") as f:
@@ -71,29 +65,37 @@ except Exception as e:
     st.error(f"Error loading database: {e}")
     commands_db = []
 
-# Safe dictionary key scanner to capture both variations (lower vs capitalized)
-def get_field(d, options):
-    for opt in options:
-        if opt in d: return d[opt]
-        if opt.lower() in d: return d[opt.lower()]
-        if opt.capitalize() in d: return d[opt.capitalize()]
-    return ""
-
 clean_db = []
 for entry in commands_db:
     if isinstance(entry, dict):
+        # We search every possible text variable style to guarantee we extract the description text
+        cmd_name = entry.get("command") or entry.get("name") or entry.get("Command") or entry.get("Name") or "Unknown"
+        software = entry.get("software") or entry.get("system") or entry.get("Software") or entry.get("System") or "Universal"
+        shortcut = entry.get("shortcut") or entry.get("key") or entry.get("Shortcut") or entry.get("Key") or "N/A"
+        
+        # Scrape every possible variant of description / definition / info keys
+        description = (
+            entry.get("description") or 
+            entry.get("definition") or 
+            entry.get("info") or 
+            entry.get("Description") or 
+            entry.get("Definition") or 
+            entry.get("Info") or 
+            "No description text found in database row structure."
+        )
+        
         clean_db.append({
-            "name": get_field(entry, ["command", "name"]),
-            "software": get_field(entry, ["software", "system"]),
-            "shortcut": get_field(entry, ["shortcut", "key"]),
-            "description": get_field(entry, ["description", "info", "definition"])
+            "name": str(cmd_name),
+            "software": str(software),
+            "shortcut": str(shortcut),
+            "description": str(description)
         })
 
 # ==========================================
 # 5. CORE SEARCH INTERFACE
 # ==========================================
-st.markdown('<h1 style="font-family: monospace; text-align: center; margin-bottom: 5px;">📐 CADD CORE ENGINE</h1>', unsafe_allow_html=True)
-st.markdown('<p style="color: #64748B; text-align: center; margin-top: 0px;">Type a shortcut token to query data structures</p>', unsafe_allow_html=True)
+st.title("📐 CADD CORE ENGINE")
+st.caption("Type a shortcut token to query data structures")
 st.markdown("<br>", unsafe_allow_html=True)
 
 search_query = st.text_input("🔍 Search box:", "").strip().lower()
@@ -112,7 +114,7 @@ if search_query:
             suggestions.append((label, cmd))
 
 # ==========================================
-# 6. INSTANT DEFINITION CARD DISPLAY
+# 6. INSTANT DEFINITION CARD DISPLAY (Native Streamlit)
 # ==========================================
 if search_query:
     if suggestions:
@@ -123,23 +125,20 @@ if search_query:
         selected_cmd = next(item[1] for item in suggestions if item[0] == selected_label)
         
         st.markdown("---")
-        accent_color = "#38BDF8" if selected_cmd["software"] == "AutoCAD" else "#A855F7"
         
-        # Unified template styling block bringing back the crystal clear descriptions!
-        st.markdown(f"""
-        <div style="padding: 24px; border-left: 5px solid {accent_color}; background-color: rgba(255,255,255,0.015); border-radius: 0 8px 8px 0; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.02); border-right: 1px solid rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.02);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <div>
-                    <span style="font-family: monospace; font-size: 1.5rem; font-weight: 700;">{selected_cmd['name']}</span>
-                    <span style="font-size: 0.8rem; background: rgba(255,255,255,0.08); padding: 3px 8px; border-radius: 4px; margin-left: 10px; font-weight: 600;">{selected_cmd['software']}</span>
-                </div>
-                <span style="font-family: monospace; color: #10B981; font-size: 1.6rem; font-weight: 800;">{selected_cmd['shortcut']}</span>
-            </div>
-            <div class="description-text" style="font-size: 1.1rem; line-height: 1.6; font-weight: 400; padding-top: 5px;">
-                {selected_cmd['description']}
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+        # Using Native Streamlit containers completely shields text visibility layout issues!
+        with st.container(border=True):
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                st.subheader(selected_cmd["name"])
+                st.caption(f"System: {selected_cmd['software']}")
+            with col2:
+                st.metric(label="Shortcut", value=selected_cmd["shortcut"])
+            
+            st.markdown("---")
+            st.markdown("**Command Definition:**")
+            st.write(selected_cmd["description"])
+            
     else:
         st.info("No matching commands indexed. Refine token search query input.")
 else:
