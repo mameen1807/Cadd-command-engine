@@ -53,7 +53,11 @@ if ui_theme == "Dark Matte Studio":
                               linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 0);
             background-size: 32px 32px;
         }
-        label, p, span, h1, h2, h3, th, td { color: #E2E8F0 !important; }
+        label, p, span, h1, h2, h3 { color: #E2E8F0 !important; }
+        
+        /* Force high contrast table text for dark mode */
+        table, th, td { color: #E2E8F0 !important; background-color: #151922 !important; }
+        
         .stTextInput input {
             background-color: #151922 !important;
             border: 1px solid #222936 !important;
@@ -78,7 +82,11 @@ else:
                               linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 0);
             background-size: 24px 24px;
         }
-        label, p, span, h1, h2, h3, th, td { color: #0F172A !important; }
+        label, p, span, h1, h2, h3 { color: #0F172A !important; }
+        
+        /* Force high contrast table text for light mode */
+        table, th, td { color: #0F172A !important; background-color: #FFFFFF !important; }
+        
         .stTextInput input {
             background-color: #FFFFFF !important;
             border: 1px solid #CBD5E1 !important;
@@ -154,7 +162,7 @@ if filtered_commands:
             """, unsafe_allow_html=True)
             
     elif view_mode == "Compact Command Table":
-        # Transform results into a clean, unified grid structure
+        # CRITICAL FIX: The keys here must match the raw lowercase JSON dictionary entries precisely!
         table_data = []
         for cmd in filtered_commands:
             table_data.append({
