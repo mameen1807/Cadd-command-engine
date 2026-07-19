@@ -5,19 +5,27 @@ import re
 # 1. Canvas Setup
 st.set_page_config(page_title="CADD Command Engine", layout="centered")
 
-# 2. Premium Dark Studio Styling & White-Label Logic via CSS Injection
+# 2. Complete White-Label Injection & Matte Charcoal Theme Canvas
 st.markdown("""
     <style>
-    /* 1. Complete White-Label Injection: Evaporate all hosting banners, profile menus, and footers */
-    #MainMenu, footer, header {visibility: hidden; display: none !important;}
-    div[data-testid="stHeader"] {background: transparent !important; background-color: transparent !important; display: none !important;}
-    div[data-testid="stToolbar"] {visibility: hidden; display: none !important;}
-    div[data-testid="stDecoration"] {display: none !important;}
-    div[data-testid="stStatusWidget"] {visibility: hidden; display: none !important;}
-    footer {visibility: hidden; display: none !important;}
-    .viewerBadge_container__1QS1h {display: none !important;}
+    /* Force-vanish the header, standard menus, toolbar buttons, and the bottom viewer footer */
+    header, footer, #MainMenu {visibility: hidden !important; display: none !important;}
+    div[data-testid="stHeader"] {display: none !important; visibility: hidden !important;}
+    div[data-testid="stToolbar"] {display: none !important; visibility: hidden !important;}
     
-    /* 2. Matte Charcoal Dark Studio Canvas with Technical Grid */
+    /* Squashes the new 'Fork this app / View code / Hosted by Streamlit' badge updates */
+    [class*="viewerBadge"], [class*="styles_viewerBadge"], [class*="viewerBadge_container"] {
+        display: none !important; 
+        visibility: hidden !important; 
+        opacity: 0 !important; 
+        height: 0 !important; 
+        width: 0 !important;
+    }
+    
+    /* Completely blocks the top border color accent strip */
+    div[data-testid="stDecoration"] {display: none !important; visibility: hidden !important;}
+
+    /* Premium Dark Studio Canvas Layout with Technical Grid */
     .stApp {
         background-color: #0D0F12 !important;
         background-image: linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 0),
@@ -25,13 +33,13 @@ st.markdown("""
         background-size: 32px 32px;
     }
     
-    /* Sleek Typography Rules */
+    /* Sleek Studio Typography Setup */
     label, p, .stSelectbox, .stTextInput input {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
         letter-spacing: -0.01em;
     }
     
-    /* Industrial Input Fields */
+    /* Technical Dark Input Frames */
     .stTextInput input, .stSelectbox div[data-baseweb="select"] {
         background-color: #151922 !important;
         border: 1px solid #222936 !important;
@@ -39,7 +47,7 @@ st.markdown("""
         color: #E2E8F0 !important;
     }
     
-    /* Target Output Container Wrapper for Scan Line */
+    /* Setup Output Area Layout Elements */
     div[data-testid="stVerticalBlock"] > div:has(.studio-panel-marker) {
         position: relative;
         padding: 20px 0;
@@ -47,7 +55,7 @@ st.markdown("""
         overflow: hidden;
     }
     
-    /* Smooth Laser Scanner Drafting Animation */
+    /* Cyberpunk Laser Drafting Scanner Animation Sequence */
     div[data-testid="stVerticalBlock"] > div:has(.studio-panel-marker)::after {
         content: '';
         position: absolute;
@@ -66,15 +74,6 @@ st.markdown("""
         100% { top: 100%; opacity: 0; }
     }
     </style>
-
-    <script>
-    /* Absolute global hotkey interception to completely squash the Streamlit cache menu */
-    window.addEventListener('keydown', function(e) {
-        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
-            e.stopPropagation();
-        }
-    }, true);
-    </script>
     """, unsafe_allow_html=True)
 
 # 3. Clean Studio Branding Header
