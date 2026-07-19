@@ -52,7 +52,6 @@ if ui_theme == "Dark Matte Studio":
         label, p, span, h1, h2, h3, div, h4 { color: #E2E8F0 !important; }
         .stTextInput input, .stSelectbox div { background-color: #151922 !important; border: 1px solid #222936 !important; color: #E2E8F0 !important; }
         .stContentBlock { background-color: #11141B !important; border: 1px solid #222936 !important; }
-        /* High contrast colors for text inside badges on Dark Mode */
         .badge-txt { color: #FFFFFF !important; }
         </style>
         """, unsafe_allow_html=True)
@@ -67,12 +66,10 @@ else:
                               linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 0);
             background-size: 24px 24px;
         }
-        /* Forces deep, razor-sharp dark text on light mode to prevent fading out */
         label, p, span, h1, h2, h3, div, h4, .stMarkdown p { color: #0F172A !important; font-weight: 500; }
         h1, h2, h3 { color: #020617 !important; font-weight: 700 !important; }
         .stTextInput input, .stSelectbox div { background-color: #FFFFFF !important; border: 1px solid #94A3B8 !important; color: #0F172A !important; }
         .stContentBlock { background-color: #FFFFFF !important; border: 1px solid #CBD5E1 !important; }
-        /* Dark text for badges inside Light Mode for visibility */
         .badge-txt { color: #0F172A !important; }
         </style>
         """, unsafe_allow_html=True)
@@ -118,7 +115,6 @@ st.markdown('<h1 style="font-family: monospace; text-align: center; margin-botto
 st.markdown('<p style="color: #64748B; text-align: center; margin-top: 0px;">Instant Engine Autocomplete Reference</p>', unsafe_allow_html=True)
 st.markdown("<br>", unsafe_allow_html=True)
 
-# CAD Systems are now placed on the main page layout!
 software_choice = st.segmented_control(
     "Select Subsystem Workspace Mode:",
     ["All Systems", "AutoCAD Engine", "SolidWorks Engine"],
@@ -147,7 +143,7 @@ if search_query:
             suggestions.append((label, cmd))
 
 # ==========================================
-# 5. HIGH-CONTRAST CARD RENDERING
+# 5. FIXED CARD RENDERING
 # ==========================================
 if search_query:
     if suggestions:
@@ -158,27 +154,27 @@ if search_query:
         st.markdown("---")
         
         if selected_cmd["software"] == "AutoCAD":
-            brand_color = "#DC2626"  # True Red
+            brand_color = "#DC2626"
             bg_badge = autocad_badge
-            border_line = "rgba(220, 38, 38, 0.4)"
+            border_style = "border-top: 1px solid rgba(220, 38, 38, 0.4);"
         else:
-            brand_color = "#2563EB"  # True Blue
+            brand_color = "#2563EB"
             bg_badge = solidworks_badge
-            border_line = "rgba(37, 99, 235, 0.4)"
+            border_style = "border-top: 1px solid rgba(37, 99, 235, 0.4);"
 
         icon_initials = "".join([word[0] for word in selected_cmd["name"].split()[:2]]).upper()
 
-        # Custom container using dynamic classes ensuring high contrast styles
-        st.markdown(f"""
+        # Dynamic layout builder with explicit string replacements to fix HTML parsing issues completely
+        html_card = f"""
         <div class="stContentBlock" style="
             padding: 24px; 
             border-radius: 12px; 
             border-left: 6px solid {brand_color};
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             margin-top: 10px;">
-            <table style="width:100%; border-collapse:collapse; border:none;">
+            <table style="width:100%; border-collapse:collapse; border:none; background:none;">
                 <tr style="border:none; background:none;">
-                    <td style="width:65px; vertical-align:middle; border:none; padding:0;">
+                    <td style="width:65px; vertical-align:middle; border:none; padding:0; background:none;">
                         <div style="
                             display: flex; 
                             align-items: center; 
@@ -196,7 +192,7 @@ if search_query:
                             </span>
                         </div>
                     </td>
-                    <td style="vertical-align:middle; border:none; padding:0;">
+                    <td style="vertical-align:middle; border:none; padding:0; background:none;">
                         <h3 style="margin:0; padding:0; line-height:1.2;">{selected_cmd['name']}</h3>
                         <div style="margin-top: 6px;">
                             <span class="badge-txt" style="
@@ -210,17 +206,18 @@ if search_query:
                             </span>
                         </div>
                     </td>
-                    <td style="text-align:right; vertical-align:middle; border:none; padding:0;">
-                        {f'<div><span style="font-size:0.75rem; color:#64748B; font-weight:700; text-transform:uppercase; display:block; margin-bottom:2px;">Key Map</span><span style="font-family:monospace; font-size:1.5rem; font-weight:800; color:{brand_color} !important;">{selected_cmd["shortcut"]}</span></div>' if selected_cmd["shortcut"] else ''}
+                    <td style="text-align:right; vertical-align:middle; border:none; padding:0; background:none;">
+                        {"<div><span style='font-size:0.75rem; color:#64748B; font-weight:700; text-transform:uppercase; display:block; margin-bottom:2px;'>Key Map</span><span style='font-family:monospace; font-size:1.5rem; font-weight:800; color:" + brand_color + " !important;'>" + selected_cmd["shortcut"] + "</span></div>" if selected_cmd["shortcut"] else ""}
                     </td>
                 </tr>
             </table>
-            <hr style="border:none; border-top: 1px solid {border_line}; margin: 20px 0;">
+            <div style="{border_style} margin: 20px 0; height: 1px;"></div>
             <div style="font-size: 1.05rem; line-height: 1.6; font-weight: 500;">
                 {selected_cmd['description']}
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """
+        st.markdown(html_card, unsafe_allow_html=True)
     else:
         st.info("No matching commands indexed. Adjust entry query tokens.")
 else:
