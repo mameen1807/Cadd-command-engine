@@ -1,6 +1,7 @@
 import streamlit as st
 import json
 import re
+import os
 
 # ==========================================
 # 1. CORE WEBAPP PAGE SETUP & BRUTE SHORTCUT INTERCEPT
@@ -12,8 +13,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Injects global JavaScript to forcefully kill the Ctrl+C / Cmd+C shortcut combo 
-# so Streamlit never brings up its annoying cache clearing screen.
 st.markdown("""
 <script>
 window.addEventListener('keydown', function(e) {
@@ -83,6 +82,27 @@ except Exception as e:
     st.error(f"Error loading database: {e}")
     commands_db = []
 
+# Fallback UI Emojis to keep it looking fresh until you add images
+EMOJI_ICONS = {
+    "line": "✏️",
+    "rectangle": "⬜",
+    "fillet": "↪️",
+    "chamfer": "📐",
+    "extend": "➡️",
+    "offset": "♊",
+    "mirror": "🪞",
+    "explode": "💥",
+    "join": "🔗",
+    "extruded boss/base": "📦",
+    "revolved boss/base": "🔄",
+    "revolved cut": "🛞",
+    "swept boss/base": "〰️",
+    "linear pattern": "░",
+    "circular pattern": "🔘",
+    "rib": "🧱",
+    "straight slot": "💊"
+}
+
 clean_db = []
 for entry in commands_db:
     if isinstance(entry, dict):
@@ -90,20 +110,24 @@ for entry in commands_db:
         software = entry.get("software", "Universal")
         definition = entry.get("use", "No description provided.")
         
-        # Regex extraction: Extract shortcut if formatted like "LINE (L)"
         match = re.search(r"^(.*?)\s*\((.*?)\)$", raw_name)
         if match:
             clean_name = match.group(1).strip()
             shortcut = match.group(2).strip()
         else:
             clean_name = raw_name.strip()
-            shortcut = None  # Explicitly clear out instead of string 'Menu/Icon'
+            shortcut = None
+            
+        # Determine fallback visual icon
+        fallback_icon = EMOJI_ICONS.get(clean_name.lower(), "🛠️")
             
         clean_db.append({
             "name": clean_name,
             "software": software,
             "shortcut": shortcut,
-            "description": definition
+            "description": definition,
+            "emoji": fallback_icon,
+            "image_filename": f"{clean_name.lower().replace(' ', '_').replace('/', '_')}.png"
         })
 
 # ==========================================
@@ -115,7 +139,6 @@ st.markdown("<br>", unsafe_allow_html=True)
 
 search_query = st.text_input("🔍 Search box:", "").strip().lower()
 
-# Build matched lists based on keystroke query
 suggestions = []
 if search_query:
     for cmd in clean_db:
@@ -124,19 +147,18 @@ if search_query:
         if software_choice == "SolidWorks Engine" and cmd["software"] != "SolidWorks":
             continue
             
-        # Flexible lookup matches tool name or shortcut phrase safely
         matches_name = search_query in cmd["name"].lower()
         matches_shortcut = cmd["shortcut"] and search_query in cmd["shortcut"].lower()
         
         if matches_name or matches_shortcut:
             if cmd["shortcut"]:
-                label = f"{cmd['name']} [{cmd['shortcut']}] — ({cmd['software']})"
+                label = f"{cmd['emoji']} {cmd['name']} [{cmd['shortcut']}] — ({cmd['software']})"
             else:
-                label = f"{cmd['name']} — ({cmd['software']})"
+                label = f"{cmd['emoji']} {cmd['name']} — ({cmd['software']})"
             suggestions.append((label, cmd))
 
 # ==========================================
-# 6. DISPLAY SELECTION & RICH CARD VIEW
+# 6. DISPLAY SELECTION & RICH CARD VIEW WITH IMAGE ENGINE
 # ==========================================
 if search_query:
     if suggestions:
@@ -148,18 +170,25 @@ if search_query:
         st.markdown("---")
         
         with st.container(border=True):
-            # If there is a key command shortcut, split the layout block columns
-            if selected_cmd["shortcut"]:
-                col1, col2 = st.columns([3, 1])
-                with col1:
-                    st.subheader(selected_cmd["name"])
-                    st.caption(f"Subsystem Environment: {selected_cmd['software']}")
-                with col2:
-                    st.metric(label="System Key", value=selected_cmd["shortcut"])
-            else:
-                # If there's no shortcut (like features in SolidWorks), display a single spacious header block
+            # Dynamic Icon Selector: Use custom image if it exists, otherwise fall back to stylized emoji
+            image_path = os.path.join("icons", selected_cmd["image_filename"])
+            
+            # Setup columns for the header layout
+            col_icon, col_title, col_metric = st.columns([1, 5, 2])
+            
+            with col_icon:
+                if os.path.exists(image_path):
+                    st.image(image_path, width=48)
+                else:
+                    st.markdown(f"<h1 style='margin:0; padding:0;'>{selected_cmd['emoji']}</h1>", unsafe_allow_html=True)
+            
+            with col_title:
                 st.subheader(selected_cmd["name"])
                 st.caption(f"Subsystem Environment: {selected_cmd['software']}")
+                
+            with col_metric:
+                if selected_cmd["shortcut"]:
+                    st.metric(label="System Key", value=selected_cmd["shortcut"])
             
             st.markdown("---")
             st.write(selected_cmd["description"])
