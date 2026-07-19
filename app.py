@@ -1,168 +1,168 @@
 import streamlit as st
 import json
-import re
 
-# 1. Canvas Setup
-st.set_page_config(page_title="CADD Command Engine", layout="centered")
+# ==========================================
+# 1. CORE WEBAPP PAGE SETUP
+# ==========================================
+st.set_page_config(
+    page_title="CADD Core | Reference Engine",
+    page_icon="📐",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-# 2. Complete White-Label Injection & Matte Charcoal Theme Canvas
-st.markdown("""
-    <style>
-    /* Force-vanish the header, standard menus, toolbar buttons, and the bottom viewer footer */
-    header, footer, #MainMenu {visibility: hidden !important; display: none !important;}
-    div[data-testid="stHeader"] {display: none !important; visibility: hidden !important;}
-    div[data-testid="stToolbar"] {display: none !important; visibility: hidden !important;}
+# ==========================================
+# 2. SIDEBAR CONTROL & PREFERENCES PANEL
+# ==========================================
+with st.sidebar:
+    st.markdown('<h2 style="color: #38BDF8; font-family: monospace; margin-bottom: 5px;">⚙️ STUDIO CONTROL</h2>', unsafe_allow_html=True)
+    st.markdown('<p style="color: #64748B; font-size: 0.85rem; margin-top: 0px;">Configure your terminal workspace layout</p>', unsafe_allow_html=True)
+    st.markdown("---")
     
-    /* Squashes the new 'Fork this app / View code / Hosted by Streamlit' badge updates */
-    [class*="viewerBadge"], [class*="styles_viewerBadge"], [class*="viewerBadge_container"] {
-        display: none !important; 
-        visibility: hidden !important; 
-        opacity: 0 !important; 
-        height: 0 !important; 
-        width: 0 !important;
-    }
+    # User Preference Toggles
+    ui_theme = st.selectbox(
+        "Workspace Visual Theme", 
+        ["Dark Matte Studio", "Drafting Light Mode"]
+    )
     
-    /* Completely blocks the top border color accent strip */
-    div[data-testid="stDecoration"] {display: none !important; visibility: hidden !important;}
+    view_mode = st.selectbox(
+        "Default Search View",
+        ["Comprehensive Layout", "Compact Command Table"],
+        help="Choose how the engine results display automatically when you search."
+    )
+    
+    st.markdown("---")
+    
+    # System Platform Engine Filters (Our original system controls)
+    st.markdown('<h3 style="color: #E2E8F0; font-size: 1rem; font-family: monospace;">🖥️ SOFTWARE ENGINE</h3>', unsafe_allow_html=True)
+    software_choice = st.radio(
+        "Filter CAD Subsystem:",
+        ["All Systems", "AutoCAD Engine", "SolidWorks Engine"]
+    )
 
-    /* Premium Dark Studio Canvas Layout with Technical Grid */
-    .stApp {
-        background-color: #0D0F12 !important;
-        background-image: linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 0),
-                          linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 0);
-        background-size: 32px 32px;
-    }
-    
-    /* Sleek Studio Typography Setup */
-    label, p, .stSelectbox, .stTextInput input {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
-        letter-spacing: -0.01em;
-    }
-    
-    /* Technical Dark Input Frames */
-    .stTextInput input, .stSelectbox div[data-baseweb="select"] {
-        background-color: #151922 !important;
-        border: 1px solid #222936 !important;
-        border-radius: 4px !important;
-        color: #E2E8F0 !important;
-    }
-    
-    /* Setup Output Area Layout Elements */
-    div[data-testid="stVerticalBlock"] > div:has(.studio-panel-marker) {
-        position: relative;
-        padding: 20px 0;
-        margin-top: 20px;
-        overflow: hidden;
-    }
-    
-    /* Cyberpunk Laser Drafting Scanner Animation Sequence */
-    div[data-testid="stVerticalBlock"] > div:has(.studio-panel-marker)::after {
-        content: '';
-        position: absolute;
-        top: -100%;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        background: linear-gradient(90deg, transparent, #2563EB, #00D2FF, transparent);
-        animation: cadScan 1.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-    }
-    
-    @keyframes cadScan {
-        0% { top: 0%; opacity: 0; }
-        15% { opacity: 1; }
-        85% { opacity: 1; }
-        100% { top: 100%; opacity: 0; }
-    }
-    </style>
-    """, unsafe_allow_html=True)
+# ==========================================
+# 3. DYNAMIC WORKSPACE STYLING INJECTION
+# ==========================================
+if ui_theme == "Dark Matte Studio":
+    # Premium Dark Studio Canvas with a Subtle Structural Grid Layout
+    st.markdown("""
+        <style>
+        .stApp {
+            background-color: #0D0F12 !important;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 0),
+                              linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 0);
+            background-size: 32px 32px;
+        }
+        label, p, span, h1, h2, h3, th, td { color: #E2E8F0 !important; }
+        .stTextInput input {
+            background-color: #151922 !important;
+            border: 1px solid #222936 !important;
+            color: #E2E8F0 !important;
+        }
+        /* Smooth Laser Scanner Drafting Animation for Dark Mode */
+        div[data-testid="stVerticalBlock"] > div:has(.studio-panel-marker)::after {
+            content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, #2563EB, #00D2FF, transparent);
+            animation: cadScan 1.6s ease-in-out forwards;
+        }
+        @keyframes cadScan { 0% { top: 0%; opacity: 0; } 50% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+        </style>
+        """, unsafe_allow_html=True)
+else:
+    # High-Visibility Drafting Light Mode (Mimics blueprint printing paper layouts)
+    st.markdown("""
+        <style>
+        .stApp {
+            background-color: #F8FAFC !important;
+            background-image: linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 0),
+                              linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+        label, p, span, h1, h2, h3, th, td { color: #0F172A !important; }
+        .stTextInput input {
+            background-color: #FFFFFF !important;
+            border: 1px solid #CBD5E1 !important;
+            color: #0F172A !important;
+        }
+        /* Orange Construction Drafting Line Animation for Light Mode */
+        div[data-testid="stVerticalBlock"] > div:has(.studio-panel-marker)::after {
+            content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, #EA580C, #F97316, transparent);
+            animation: cadScan 1.6s ease-in-out forwards;
+        }
+        @keyframes cadScan { 0% { top: 0%; opacity: 0; } 50% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+        </style>
+        """, unsafe_allow_html=True)
 
-# 3. Clean Studio Branding Header
-st.markdown("<h1 style='font-size: 2rem; font-weight: 800; letter-spacing: -0.04em; color: #F8FAFC; margin-bottom:0px;'>CADD COMMAND ENGINE</h1>", unsafe_allow_html=True)
-st.markdown("<p style='font-size: 0.95rem; color: #475569; margin-top: 2px;'>A clean creative reference for architectural and solid modelers.</p>", unsafe_allow_html=True)
-st.write("---")
-
-# 4. Fresh File Loading
-def load_commands_fresh():
-    with open("commands.json", "r") as f:
-        return json.load(f)
-
+# ==========================================
+# 4. DATABASE LOADING
+# ==========================================
 try:
-    commands_db = load_commands_fresh()
+    with open("commands.json", "r") as f:
+        commands_db = json.load(f)
 except Exception as e:
-    st.error(f"Error loading commands.json: {e}")
+    st.error(f"Error loading commands.json database tracking assets: {e}")
     commands_db = []
 
-# 5. Interface Layout Elements
-software_choice = st.selectbox("ENVIRONMENT SETTING", options=["All Softwares", "AutoCAD", "SolidWorks"])
+# ==========================================
+# 5. CORE LAYOUT & INTERFACE RENDERING
+# ==========================================
+st.markdown('<h1 style="font-family: monospace; letter-spacing: -0.03em; font-weight: 700; margin-bottom: 5px;">📐 CADD CORE ENGINE</h1>', unsafe_allow_html=True)
+st.markdown('<p style="color: #64748B; margin-top: 0px;">Instant production search matrix for engineering subsystems</p>', unsafe_allow_html=True)
 
-if software_choice != "All Softwares":
-    filtered_db = [cmd for cmd in commands_db if cmd["software"] == software_choice]
-else:
-    filtered_db = commands_db
+# Central Terminal Search Target
+search_query = st.text_input("🔍 Input token query (e.g., line, extrude, circle):", "").strip().lower()
 
-user_query = st.text_input("QUERY ENTRY", placeholder="Type what you want to achieve...").strip()
-
-# 6. Strict Token-Isolated Search Engine
-best_match = None
-
-if user_query:
-    query_clean = user_query.strip().lower()
-    
-    def clean_str(text):
-        return re.sub(r'[^a-z0-9\s]', '', text.lower()).strip()
-    
-    query_alphanumeric = clean_str(query_clean)
-    query_words = query_alphanumeric.split()
-
-    exact_match = None
-    whole_word_match = None
-
-    # --- PASS 1: Isolated Word Token Matching (No Substring Hijacking) ---
-    for cmd in filtered_db:
-        cmd_name_clean = clean_str(cmd["name"])
-        cmd_name_words = cmd_name_clean.split()
+# Token Processing & Filtration Engine Logic
+filtered_commands = []
+for cmd in commands_db:
+    # Evaluate Subsystem Filter Constraints First
+    if software_choice == "AutoCAD Engine" and cmd["software"] != "AutoCAD":
+        continue
+    if software_choice == "SolidWorks Engine" and cmd["software"] != "SolidWorks":
+        continue
         
-        if query_alphanumeric == cmd_name_clean:
-            exact_match = cmd
-            break
-        elif query_alphanumeric in cmd_name_words:
-            if not whole_word_match:
-                whole_word_match = cmd
-        elif query_alphanumeric in cmd_name_clean and (" " in query_alphanumeric):
-            if not whole_word_match:
-                whole_word_match = cmd
+    # Process Search Query String Tokens
+    if search_query:
+        match_found = (
+            search_query in cmd["command"].lower() or 
+            search_query in cmd["shortcut"].lower() or 
+            search_query in cmd["description"].lower()
+        )
+        if not match_found:
+            continue
+            
+    filtered_commands.append(cmd)
 
-    if exact_match:
-        best_match = exact_match
-    elif whole_word_match:
-        best_match = whole_word_match
+# ==========================================
+# 6. DYNAMIC DATA OUTPUT MATRIX
+# ==========================================
+st.markdown("---")
 
-    # --- PASS 2: Description Fallback (Whole Word Only) ---
-    if not best_match and query_words:
-        highest_keyword_count = 0
-        for cmd in filtered_db:
-            use_lower = f" {clean_str(cmd['use'])} "
-            match_count = sum(1 for word in query_words if len(word) > 2 and f" {word} " in use_lower)
+if filtered_commands:
+    if view_mode == "Comprehensive Layout":
+        # Classic high-fidelity tracking cards
+        for cmd in filtered_commands:
+            accent_color = "#38BDF8" if cmd["software"] == "AutoCAD" else "#A855F7"
+            st.markdown(f"""
+            <div class="studio-panel-marker" style="padding: 16px; border-left: 4px solid {accent_color}; background-color: rgba(255,255,255,0.02); border-radius: 0 6px 6px 0; margin-bottom: 12px;">
+                <span style="font-family: monospace; font-size: 1.15rem; font-weight: bold;">{cmd['command']}</span> 
+                <span style="font-size: 0.8rem; background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; margin-left: 8px;">{cmd['software']}</span>
+                <span style="float: right; font-family: monospace; color: #10B981; font-weight: bold;">{cmd['shortcut']}</span>
+                <p style="margin: 8px 0 0 0; font-size: 0.95rem; opacity: 0.85;">{cmd['description']}</p>
+            </div>
+            """, unsafe_allow_html=True)
             
-            if match_count > highest_keyword_count:
-                highest_keyword_count = match_count
-                best_match = cmd
-
-    # 7. Native Premium Output Display
-    if best_match:
-        with st.container():
-            # Invisible marker element to drop the dynamic laser scan animation line
-            st.markdown('<div class="studio-panel-marker"></div>', unsafe_allow_html=True)
-            
-            st.markdown("<p style='font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; color: #475569; margin-bottom: 0px;'>Platform</p>", unsafe_allow_html=True)
-            st.markdown(f"<p style='font-size: 1rem; font-weight: 500; color: #94A3B8; margin-top: 0px;'>{best_match['software'].upper()}</p>", unsafe_allow_html=True)
-            
-            st.markdown("<p style='font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; color: #475569; margin-bottom: 0px;'>Command</p>", unsafe_allow_html=True)
-            st.markdown(f"<p style='font-size: 2.2rem; font-weight: 700; letter-spacing: -0.03em; color: #F8FAFC; margin-top: 0px; margin-bottom: 10px;'>{best_match['name']}</p>", unsafe_allow_html=True)
-            
-            st.markdown("<div style='width: 100%; height: 1px; background: #222936; margin: 20px 0;'></div>", unsafe_allow_html=True)
-            
-            st.markdown("<p style='font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; color: #475569; margin-bottom: 0px;'>Application Description</p>", unsafe_allow_html=True)
-            st.markdown(f"<p style='font-size: 1.15rem; line-height: 1.7; color: #CBD5E1; font-weight: 400; margin-top: 0px;'>{best_match['use']}</p>", unsafe_allow_html=True)
-    else:
-        st.markdown("<p style='color: #475569; font-size: 0.9rem; margin-top: 15px;'>No matching command key found. Try another design keyword.</p>", unsafe_allow_html=True)
+    elif view_mode == "Compact Command Table":
+        # Transform results into a clean, unified grid structure
+        table_data = []
+        for cmd in filtered_commands:
+            table_data.append({
+                "System Platform": "📐 CAD" if cmd['software'] == "AutoCAD" else "💎 SW",
+                "Key Command": cmd['command'],
+                "Hot Shortcut": cmd['shortcut'],
+                "Function Scope": cmd['description']
+            })
+        st.table(table_data)
+else:
+    st.info("No matching structural tool definitions mapped to query tokens.")
