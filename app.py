@@ -1,7 +1,6 @@
 import streamlit as st
 import json
 import re
-import os
 
 # ==========================================
 # 1. CORE WEBAPP PAGE SETUP & BRUTE SHORTCUT INTERCEPT
@@ -82,25 +81,13 @@ except Exception as e:
     st.error(f"Error loading database: {e}")
     commands_db = []
 
-# Fallback UI Emojis to keep it looking fresh until you add images
+# Automated Dictionary fallback icons map to handle search menu visually
 EMOJI_ICONS = {
-    "line": "✏️",
-    "rectangle": "⬜",
-    "fillet": "↪️",
-    "chamfer": "📐",
-    "extend": "➡️",
-    "offset": "♊",
-    "mirror": "🪞",
-    "explode": "💥",
-    "join": "🔗",
-    "extruded boss/base": "📦",
-    "revolved boss/base": "🔄",
-    "revolved cut": "🛞",
-    "swept boss/base": "〰️",
-    "linear pattern": "░",
-    "circular pattern": "🔘",
-    "rib": "🧱",
-    "straight slot": "💊"
+    "line": "✏️", "rectangle": "⬜", "fillet": "↪️", "chamfer": "📐", 
+    "extend": "➡️", "offset": "♊", "mirror": "🪞", "explode": "💥", 
+    "join": "🔗", "extruded boss/base": "📦", "revolved boss/base": "🔄", 
+    "revolved cut": "🛞", "swept boss/base": "〰️", "linear pattern": "░", 
+    "circular pattern": "🔘", "rib": "🧱", "straight slot": "💊"
 }
 
 clean_db = []
@@ -118,7 +105,6 @@ for entry in commands_db:
             clean_name = raw_name.strip()
             shortcut = None
             
-        # Determine fallback visual icon
         fallback_icon = EMOJI_ICONS.get(clean_name.lower(), "🛠️")
             
         clean_db.append({
@@ -126,8 +112,7 @@ for entry in commands_db:
             "software": software,
             "shortcut": shortcut,
             "description": definition,
-            "emoji": fallback_icon,
-            "image_filename": f"{clean_name.lower().replace(' ', '_').replace('/', '_')}.png"
+            "emoji": fallback_icon
         })
 
 # ==========================================
@@ -158,7 +143,7 @@ if search_query:
             suggestions.append((label, cmd))
 
 # ==========================================
-# 6. DISPLAY SELECTION & RICH CARD VIEW WITH IMAGE ENGINE
+# 6. DISPLAY SELECTION & RICH CARD VIEW WITH VECTOR ENGINE
 # ==========================================
 if search_query:
     if suggestions:
@@ -166,31 +151,69 @@ if search_query:
         selected_label = st.selectbox(f"Select from {len(suggestions)} matching features:", options_labels)
         
         selected_cmd = next(item[1] for item in suggestions if item[0] == selected_label)
-        
         st.markdown("---")
         
+        # Color profile logic mapping matching system platform design palettes
+        if selected_cmd["software"] == "AutoCAD":
+            brand_color = "#E53E3E"  # Autodesk Red
+            accent_color = "#38BDF8"
+            bg_badge = "rgba(229, 62, 62, 0.15)"
+        else:
+            brand_color = "#1E40AF"  # Dassault Blue
+            accent_color = "#A855F7"
+            bg_badge = "rgba(30, 64, 175, 0.2)"
+
+        # Automatically generates the first letter or abbreviation to create a clean UI block
+        icon_initials = "".join([word[0] for word in selected_cmd["name"].split()[:2]]).upper()
+
         with st.container(border=True):
-            # Dynamic Icon Selector: Use custom image if it exists, otherwise fall back to stylized emoji
-            image_path = os.path.join("icons", selected_cmd["image_filename"])
-            
-            # Setup columns for the header layout
-            col_icon, col_title, col_metric = st.columns([1, 5, 2])
+            col_icon, col_title, col_metric = st.columns([1, 4, 2])
             
             with col_icon:
-                if os.path.exists(image_path):
-                    st.image(image_path, width=48)
-                else:
-                    st.markdown(f"<h1 style='margin:0; padding:0;'>{selected_cmd['emoji']}</h1>", unsafe_allow_html=True)
+                # DYNAMIC EMBEDDED VECTOR ICON GENERATOR
+                st.markdown(f"""
+                <div style="
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center; 
+                    width: 52px; 
+                    height: 52px; 
+                    background-color: {brand_color}; 
+                    border-radius: 8px; 
+                    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
+                    border: 1px solid rgba(255,255,255,0.1);
+                    margin-top: 5px;">
+                    <span style="
+                        color: white !important; 
+                        font-family: 'Courier New', monospace; 
+                        font-size: 1.35rem; 
+                        font-weight: 900; 
+                        letter-spacing: -1px;">
+                        {icon_initials}
+                    </span>
+                </div>
+                """, unsafe_allow_html=True)
             
             with col_title:
                 st.subheader(selected_cmd["name"])
-                st.caption(f"Subsystem Environment: {selected_cmd['software']}")
+                st.markdown(f"""
+                    <span style="
+                        font-size: 0.75rem; 
+                        background: {bg_badge}; 
+                        color: white !important;
+                        padding: 3px 8px; 
+                        border-radius: 4px; 
+                        font-weight: 600;
+                        border: 1px solid {brand_color}40;">
+                        {selected_cmd['software']} Ecosystem
+                    </span>
+                """, unsafe_allow_html=True)
                 
             with col_metric:
                 if selected_cmd["shortcut"]:
                     st.metric(label="System Key", value=selected_cmd["shortcut"])
             
-            st.markdown("---")
+            st.markdown("<br>", unsafe_allow_html=True)
             st.write(selected_cmd["description"])
     else:
         st.info("No matching commands indexed. Adjust entry query tokens.")
