@@ -5,13 +5,19 @@ import re
 # 1. Canvas Setup
 st.set_page_config(page_title="CADD Command Engine", layout="centered")
 
-# 2. Premium Dark Studio Styling & Animation Logic via Global CSS Injection
+# 2. Premium Dark Studio Styling & White-Label Logic via CSS Injection
 st.markdown("""
     <style>
-    /* Hide clunky default developer UI lines */
-    #MainMenu, footer, header {visibility: hidden;}
+    /* 1. Complete White-Label Injection: Evaporate all hosting banners, profile menus, and footers */
+    #MainMenu, footer, header {visibility: hidden; display: none !important;}
+    div[data-testid="stHeader"] {background: transparent !important; background-color: transparent !important; display: none !important;}
+    div[data-testid="stToolbar"] {visibility: hidden; display: none !important;}
+    div[data-testid="stDecoration"] {display: none !important;}
+    div[data-testid="stStatusWidget"] {visibility: hidden; display: none !important;}
+    footer {visibility: hidden; display: none !important;}
+    .viewerBadge_container__1QS1h {display: none !important;}
     
-    /* Matte Charcoal Dark Studio Canvas with a Subtle Technical Grid */
+    /* 2. Matte Charcoal Dark Studio Canvas with Technical Grid */
     .stApp {
         background-color: #0D0F12 !important;
         background-image: linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 0),
@@ -33,7 +39,7 @@ st.markdown("""
         color: #E2E8F0 !important;
     }
     
-    /* Target the Output Container Wrapper for the Scan Line */
+    /* Target Output Container Wrapper for Scan Line */
     div[data-testid="stVerticalBlock"] > div:has(.studio-panel-marker) {
         position: relative;
         padding: 20px 0;
