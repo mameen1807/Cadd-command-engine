@@ -3,7 +3,7 @@ import json
 import re
 
 # ==========================================
-# 1. CORE WEBAPP PAGE SETUP
+# 1. CORE WEBAPP PAGE SETUP & BRUTE SHORTCUT INTERCEPT
 # ==========================================
 st.set_page_config(
     page_title="CADD Core | Reference Engine",
@@ -11,6 +11,19 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="expanded"
 )
+
+# Injects global JavaScript to forcefully kill the Ctrl+C / Cmd+C shortcut combo 
+# so Streamlit never brings up its annoying cache clearing screen.
+st.markdown("""
+<script>
+window.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+    }
+}, true);
+</script>
+""", unsafe_allow_html=True)
 
 # ==========================================
 # 2. SIDEBAR CONTROL & PREFERENCES PANEL
@@ -77,14 +90,14 @@ for entry in commands_db:
         software = entry.get("software", "Universal")
         definition = entry.get("use", "No description provided.")
         
-        # Regex extraction: If name looks like "LINE (L)", pull out "LINE" and "L"
+        # Regex extraction: Extract shortcut if formatted like "LINE (L)"
         match = re.search(r"^(.*?)\s*\((.*?)\)$", raw_name)
         if match:
             clean_name = match.group(1).strip()
             shortcut = match.group(2).strip()
         else:
             clean_name = raw_name.strip()
-            shortcut = "Menu/Icon"  # Fallback for tools without explicit shortcut strings
+            shortcut = None  # Explicitly clear out instead of string 'Menu/Icon'
             
         clean_db.append({
             "name": clean_name,
@@ -97,7 +110,7 @@ for entry in commands_db:
 # 5. CORE SEARCH INTERFACE
 # ==========================================
 st.markdown('<h1 style="font-family: monospace; text-align: center; margin-bottom: 5px;">📐 CADD CORE ENGINE</h1>', unsafe_allow_html=True)
-st.markdown('<p style="color: #64748B; text-align: center; margin-top: 0px;">Type a tool name or character key to begin suggestion query</p>', unsafe_allow_html=True)
+st.markdown('<p style="color: #64748B; text-align: center; margin-top: 0px;">Type a tool name or shortcut to search</p>', unsafe_allow_html=True)
 st.markdown("<br>", unsafe_allow_html=True)
 
 search_query = st.text_input("🔍 Search box:", "").strip().lower()
@@ -111,9 +124,15 @@ if search_query:
         if software_choice == "SolidWorks Engine" and cmd["software"] != "SolidWorks":
             continue
             
-        # Match against name or shortcut
-        if search_query in cmd["name"].lower() or search_query in cmd["shortcut"].lower():
-            label = f"{cmd['name']} [{cmd['shortcut']}] — ({cmd['software']})"
+        # Flexible lookup matches tool name or shortcut phrase safely
+        matches_name = search_query in cmd["name"].lower()
+        matches_shortcut = cmd["shortcut"] and search_query in cmd["shortcut"].lower()
+        
+        if matches_name or matches_shortcut:
+            if cmd["shortcut"]:
+                label = f"{cmd['name']} [{cmd['shortcut']}] — ({cmd['software']})"
+            else:
+                label = f"{cmd['name']} — ({cmd['software']})"
             suggestions.append((label, cmd))
 
 # ==========================================
@@ -124,20 +143,23 @@ if search_query:
         options_labels = [item[0] for item in suggestions]
         selected_label = st.selectbox(f"Select from {len(suggestions)} matching features:", options_labels)
         
-        # Extract the chosen command row entry
         selected_cmd = next(item[1] for item in suggestions if item[0] == selected_label)
         
         st.markdown("---")
-        accent_color = "#38BDF8" if selected_cmd["software"] == "AutoCAD" else "#A855F7"
         
-        # Native safe UI structure with absolute mapping to description string values
         with st.container(border=True):
-            col1, col2 = st.columns([3, 1])
-            with col1:
+            # If there is a key command shortcut, split the layout block columns
+            if selected_cmd["shortcut"]:
+                col1, col2 = st.columns([3, 1])
+                with col1:
+                    st.subheader(selected_cmd["name"])
+                    st.caption(f"Subsystem Environment: {selected_cmd['software']}")
+                with col2:
+                    st.metric(label="System Key", value=selected_cmd["shortcut"])
+            else:
+                # If there's no shortcut (like features in SolidWorks), display a single spacious header block
                 st.subheader(selected_cmd["name"])
                 st.caption(f"Subsystem Environment: {selected_cmd['software']}")
-            with col2:
-                st.metric(label="System Key", value=selected_cmd["shortcut"])
             
             st.markdown("---")
             st.write(selected_cmd["description"])
@@ -146,6 +168,6 @@ if search_query:
 else:
     st.markdown("""
     <div style="text-align: center; color: #64748B; padding: 50px 0; font-style: italic; font-family: monospace; font-size: 0.9rem;">
-        // Engine ready. Enter terminal character to query database arrays.
+        // Engine ready. Enter key token to begin query sequence.
     </div>
     """, unsafe_allow_html=True)
