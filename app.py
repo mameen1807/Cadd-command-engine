@@ -3,7 +3,7 @@ import json
 import re
 
 # ==========================================
-# 1. CORE WEBAPP PAGE SETUP & SAFETY HOOKS
+# 1. CORE WEBAPP PAGE SETUP & INJECTIONS
 # ==========================================
 st.set_page_config(
     page_title="CADD Core | Reference Engine",
@@ -12,7 +12,9 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Kills Ctrl+C cache interrupts AND violently strips away the hover link symbols (#)
+# Complete styling hammer:
+# 1. Blocks Ctrl+C cache interrupts completely.
+# 2. Obliterates the text anchor symbols using every known element tag variant.
 st.markdown("""
 <script>
 window.addEventListener('keydown', function(e) {
@@ -23,55 +25,54 @@ window.addEventListener('keydown', function(e) {
 }, true);
 </script>
 <style>
-/* Hides the structural link anchors globally */
-a.element-hover-anchor {
+/* Aggressive annihilation of the hover link symbols (#) */
+.element-hover-anchor, 
+a.element-hover-anchor, 
+[data-testid="stHeaderActionElements"] a,
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
     display: none !important;
-}
-/* Custom card styling overrides */
-div[data-testid="stVerticalBlockBorderWrapper"] {
-    border-radius: 12px !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.04) !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 2. THEME SELECTION & HIGH-CONTRAST ENGINE
+# 2. SIDEBAR WORKSPACE OPTIMIZATION
 # ==========================================
 with st.sidebar:
-    st.markdown('<h2 style="font-family: monospace;">⚙️ THEME MATRIX</h2>', unsafe_allow_html=True)
+    st.markdown('### ⚙️ SYSTEM SETTINGS')
     ui_theme = st.selectbox(
         "Workspace Visual Theme", 
         ["Dark Matte Studio", "Drafting Light Mode"]
     )
 
+# Clean, safe background grid rendering that leaves text elements untouched
 if ui_theme == "Dark Matte Studio":
     st.markdown("""
         <style>
         .stApp {
             background-color: #0D0F12 !important;
             background-image: linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 0),
-                              linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 0);
-            background-size: 32px 32px;
+                              linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 0) !important;
+            background-size: 32px 32px !important;
         }
-        label, p, span, h1, h2, h3, div, h4 { color: #E2E8F0 !important; }
-        .stTextInput input, .stSelectbox div { background-color: #151922 !important; border: 1px solid #222936 !important; color: #E2E8F0 !important; }
         </style>
         """, unsafe_allow_html=True)
     brand_autocad = "#EF4444"
     brand_solidworks = "#3B82F6"
 else:
+    # High-contrast light layout that preserves natural input field text colors
     st.markdown("""
         <style>
         .stApp {
             background-color: #F8FAFC !important;
             background-image: linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 0),
-                              linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 0);
-            background-size: 24px 24px;
+                              linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 0) !important;
+            background-size: 24px 24px !important;
         }
-        label, p, span, h1, h2, h3, div, h4, .stMarkdown p { color: #0F172A !important; font-weight: 500; }
-        h1, h2, h3 { color: #020617 !important; font-weight: 700 !important; }
-        .stTextInput input, .stSelectbox div { background-color: #FFFFFF !important; border: 1px solid #94A3B8 !important; color: #0F172A !important; }
         </style>
         """, unsafe_allow_html=True)
     brand_autocad = "#DC2626"
@@ -112,11 +113,11 @@ for entry in commands_db:
 # ==========================================
 # 4. MAIN PAGE INTERFACE & ROW SELECTORS
 # ==========================================
-st.markdown('<h1 style="font-family: monospace; text-align: center; margin-bottom: 5px;">📐 CADD CORE ENGINE</h1>', unsafe_allow_html=True)
-st.markdown('<p style="color: #64748B; text-align: center; margin-top: 0px;">Instant Engine Autocomplete Reference</p>', unsafe_allow_html=True)
+st.title("📐 CADD CORE ENGINE")
+st.caption("Instant Engine Autocomplete Reference")
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Main page workspace tabs
+# Central filter bar
 software_choice = st.segmented_control(
     "Select Subsystem Workspace Mode:",
     ["All Systems", "AutoCAD Engine", "SolidWorks Engine"],
@@ -145,7 +146,7 @@ if search_query:
             suggestions.append((label, cmd))
 
 # ==========================================
-# 5. BUG-FREE NATIVE CONTAINER RENDERING
+# 5. HIGH-CONTRAST DATA CONTAINER VIEW
 # ==========================================
 if search_query:
     if suggestions:
@@ -155,11 +156,10 @@ if search_query:
         selected_cmd = next(item[1] for item in suggestions if item[0] == selected_label)
         st.markdown("---")
         
-        # Color assigning
         active_color = brand_autocad if selected_cmd["software"] == "AutoCAD" else brand_solidworks
         icon_initials = "".join([word[0] for word in selected_cmd["name"].split()[:2]]).upper()
 
-        # Pure native Streamlit structural block removes all HTML parser syntax errors!
+        # Renders the card natively without complex tables, making text beautifully readable across light/dark profiles
         with st.container(border=True):
             col_icon, col_meta, col_key = st.columns([1, 4, 2])
             
@@ -174,8 +174,8 @@ if search_query:
                 """, unsafe_allow_html=True)
                 
             with col_meta:
-                st.markdown(f"<h3 style='margin:0; padding:0;'>{selected_cmd['name']}</h3>", unsafe_allow_html=True)
-                st.markdown(f"<span style='font-size:0.8rem; font-weight:700; color:{active_color};'>{selected_cmd['software']} Workspace Tool</span>", unsafe_allow_html=True)
+                st.subheader(selected_cmd['name'])
+                st.markdown(f"<span style='font-size:0.85rem; font-weight:700; color:{active_color};'>{selected_cmd['software']} Workspace Tool</span>", unsafe_allow_html=True)
                 
             with col_key:
                 if selected_cmd["shortcut"]:
