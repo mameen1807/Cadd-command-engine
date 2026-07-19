@@ -27,6 +27,11 @@ window.addEventListener('keydown', function(e) {
 a.element-hover-anchor {
     display: none !important;
 }
+/* Custom card styling overrides */
+div[data-testid="stVerticalBlockBorderWrapper"] {
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04) !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -51,12 +56,10 @@ if ui_theme == "Dark Matte Studio":
         }
         label, p, span, h1, h2, h3, div, h4 { color: #E2E8F0 !important; }
         .stTextInput input, .stSelectbox div { background-color: #151922 !important; border: 1px solid #222936 !important; color: #E2E8F0 !important; }
-        .stContentBlock { background-color: #11141B !important; border: 1px solid #222936 !important; }
-        .badge-txt { color: #FFFFFF !important; }
         </style>
         """, unsafe_allow_html=True)
-    autocad_badge = "rgba(239, 68, 68, 0.25)"
-    solidworks_badge = "rgba(59, 130, 246, 0.25)"
+    brand_autocad = "#EF4444"
+    brand_solidworks = "#3B82F6"
 else:
     st.markdown("""
         <style>
@@ -69,12 +72,10 @@ else:
         label, p, span, h1, h2, h3, div, h4, .stMarkdown p { color: #0F172A !important; font-weight: 500; }
         h1, h2, h3 { color: #020617 !important; font-weight: 700 !important; }
         .stTextInput input, .stSelectbox div { background-color: #FFFFFF !important; border: 1px solid #94A3B8 !important; color: #0F172A !important; }
-        .stContentBlock { background-color: #FFFFFF !important; border: 1px solid #CBD5E1 !important; }
-        .badge-txt { color: #0F172A !important; }
         </style>
         """, unsafe_allow_html=True)
-    autocad_badge = "rgba(239, 68, 68, 0.15)"
-    solidworks_badge = "rgba(59, 130, 246, 0.15)"
+    brand_autocad = "#DC2626"
+    brand_solidworks = "#2563EB"
 
 # ==========================================
 # 3. DATABASE CONFIGURATION
@@ -115,6 +116,7 @@ st.markdown('<h1 style="font-family: monospace; text-align: center; margin-botto
 st.markdown('<p style="color: #64748B; text-align: center; margin-top: 0px;">Instant Engine Autocomplete Reference</p>', unsafe_allow_html=True)
 st.markdown("<br>", unsafe_allow_html=True)
 
+# Main page workspace tabs
 software_choice = st.segmented_control(
     "Select Subsystem Workspace Mode:",
     ["All Systems", "AutoCAD Engine", "SolidWorks Engine"],
@@ -143,7 +145,7 @@ if search_query:
             suggestions.append((label, cmd))
 
 # ==========================================
-# 5. FIXED CARD RENDERING
+# 5. BUG-FREE NATIVE CONTAINER RENDERING
 # ==========================================
 if search_query:
     if suggestions:
@@ -153,71 +155,35 @@ if search_query:
         selected_cmd = next(item[1] for item in suggestions if item[0] == selected_label)
         st.markdown("---")
         
-        if selected_cmd["software"] == "AutoCAD":
-            brand_color = "#DC2626"
-            bg_badge = autocad_badge
-            border_style = "border-top: 1px solid rgba(220, 38, 38, 0.4);"
-        else:
-            brand_color = "#2563EB"
-            bg_badge = solidworks_badge
-            border_style = "border-top: 1px solid rgba(37, 99, 235, 0.4);"
-
+        # Color assigning
+        active_color = brand_autocad if selected_cmd["software"] == "AutoCAD" else brand_solidworks
         icon_initials = "".join([word[0] for word in selected_cmd["name"].split()[:2]]).upper()
 
-        # Dynamic layout builder with explicit string replacements to fix HTML parsing issues completely
-        html_card = f"""
-        <div class="stContentBlock" style="
-            padding: 24px; 
-            border-radius: 12px; 
-            border-left: 6px solid {brand_color};
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            margin-top: 10px;">
-            <table style="width:100%; border-collapse:collapse; border:none; background:none;">
-                <tr style="border:none; background:none;">
-                    <td style="width:65px; vertical-align:middle; border:none; padding:0; background:none;">
-                        <div style="
-                            display: flex; 
-                            align-items: center; 
-                            justify-content: center; 
-                            width: 50px; 
-                            height: 50px; 
-                            background-color: {brand_color}; 
-                            border-radius: 8px;">
-                            <span style="
-                                color: #FFFFFF !important; 
-                                font-family: monospace; 
-                                font-size: 1.3rem; 
-                                font-weight: 800;">
-                                {icon_initials}
-                            </span>
-                        </div>
-                    </td>
-                    <td style="vertical-align:middle; border:none; padding:0; background:none;">
-                        <h3 style="margin:0; padding:0; line-height:1.2;">{selected_cmd['name']}</h3>
-                        <div style="margin-top: 6px;">
-                            <span class="badge-txt" style="
-                                font-size: 0.75rem; 
-                                background: {bg_badge}; 
-                                padding: 4px 10px; 
-                                border-radius: 6px; 
-                                font-weight: 700;
-                                border: 1px solid {brand_color};">
-                                {selected_cmd['software']} Environment
-                            </span>
-                        </div>
-                    </td>
-                    <td style="text-align:right; vertical-align:middle; border:none; padding:0; background:none;">
-                        {"<div><span style='font-size:0.75rem; color:#64748B; font-weight:700; text-transform:uppercase; display:block; margin-bottom:2px;'>Key Map</span><span style='font-family:monospace; font-size:1.5rem; font-weight:800; color:" + brand_color + " !important;'>" + selected_cmd["shortcut"] + "</span></div>" if selected_cmd["shortcut"] else ""}
-                    </td>
-                </tr>
-            </table>
-            <div style="{border_style} margin: 20px 0; height: 1px;"></div>
-            <div style="font-size: 1.05rem; line-height: 1.6; font-weight: 500;">
-                {selected_cmd['description']}
-            </div>
-        </div>
-        """
-        st.markdown(html_card, unsafe_allow_html=True)
+        # Pure native Streamlit structural block removes all HTML parser syntax errors!
+        with st.container(border=True):
+            col_icon, col_meta, col_key = st.columns([1, 4, 2])
+            
+            with col_icon:
+                st.markdown(f"""
+                <div style="display:flex; align-items:center; justify-content:center; 
+                            width:50px; height:50px; background-color:{active_color}; border-radius:8px;">
+                    <span style="color:#FFFFFF !important; font-family:monospace; font-size:1.3rem; font-weight:800;">
+                        {icon_initials}
+                    </span>
+                </div>
+                """, unsafe_allow_html=True)
+                
+            with col_meta:
+                st.markdown(f"<h3 style='margin:0; padding:0;'>{selected_cmd['name']}</h3>", unsafe_allow_html=True)
+                st.markdown(f"<span style='font-size:0.8rem; font-weight:700; color:{active_color};'>{selected_cmd['software']} Workspace Tool</span>", unsafe_allow_html=True)
+                
+            with col_key:
+                if selected_cmd["shortcut"]:
+                    st.metric(label="Key Shortcut", value=selected_cmd["shortcut"])
+            
+            st.markdown("---")
+            st.write(selected_cmd["description"])
+            
     else:
         st.info("No matching commands indexed. Adjust entry query tokens.")
 else:
