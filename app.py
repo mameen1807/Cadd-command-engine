@@ -12,7 +12,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Kills Ctrl+C cache interrupts AND violently strips away the hover link symbols (#)
+# Complete global styling overrides to crush bugs
 st.markdown("""
 <script>
 window.addEventListener('keydown', function(e) {
@@ -23,12 +23,13 @@ window.addEventListener('keydown', function(e) {
 }, true);
 </script>
 <style>
-/* Absolute annihilation of the hover link symbols and their interactive SVG wrappers */
+/* Total, absolute elimination of the hover link symbols (#) */
 .element-hover-anchor, 
 a.element-hover-anchor, 
 [data-testid="stHeaderActionElements"] a,
 h1 a, h2 a, h3 a, h4 a, h5 a, h6 a,
-svg.element-hover-anchor {
+svg.element-hover-anchor,
+.st-emotion-cache-bho8b9 e1nzilva5 {
     display: none !important;
     visibility: hidden !important;
     opacity: 0 !important;
@@ -49,37 +50,20 @@ with st.sidebar:
     )
 
 # ==========================================
-# 3. ADVANCED FORCE-THEMING STYLE OVERRIDES
+# 3. HIGH-CONTRAST CANVAS CONFIGURATION
 # ==========================================
 if ui_theme == "Dark Matte Studio":
     st.markdown("""
         <style>
-        /* Base Page Background Grid */
         .stApp {
             background-color: #0D0F12 !important;
             background-image: linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 0),
                               linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 0) !important;
             background-size: 32px 32px !important;
         }
-        /* Sidebar thematic color lock down */
-        section[data-testid="stSidebar"] {
-            background-color: #11141B !important;
-        }
-        /* Global Text Color Control */
-        h1, h2, h3, h4, h5, h6, p, label, span, div {
-            color: #E2E8F0 !important;
-        }
-        /* Input Field Overrides */
-        input {
-            background-color: #151922 !important;
-            color: #E2E8F0 !important;
-            border: 1px solid #222936 !important;
-        }
-        /* Segmented Controller Theme Fix */
-        div[data-testid="stHorizontalBlock"] button {
-            background-color: #151922 !important;
-            color: #E2E8F0 !important;
-        }
+        section[data-testid="stSidebar"] { background-color: #11141B !important; }
+        h1, h2, h3, h4, h5, h6, p, label, span, div { color: #E2E8F0 !important; }
+        input { background-color: #151922 !important; color: #E2E8F0 !important; border: 1px solid #222936 !important; }
         </style>
         """, unsafe_allow_html=True)
     brand_autocad = "#EF4444"
@@ -87,43 +71,17 @@ if ui_theme == "Dark Matte Studio":
 else:
     st.markdown("""
         <style>
-        /* Base Light Grid Canvas Background */
         .stApp {
             background-color: #F8FAFC !important;
             background-image: linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 0),
                               linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 0) !important;
             background-size: 24px 24px !important;
         }
-        /* Clean Light Sidebar Canvas Lock */
-        section[data-testid="stSidebar"] {
-            background-color: #FFFFFF !important;
-            border-right: 1px solid #E2E8F0 !important;
-        }
-        /* Global High Contrast Text Color Force */
-        h1, h2, h3, h4, h5, h6, p, label, span, div, .stMarkdown p {
-            color: #0F172A !important;
-        }
-        /* Clear Input Field Box Shadows & Bright Text Visibility Override */
-        input {
-            background-color: #FFFFFF !important;
-            color: #0F172A !important;
-            border: 1px solid #94A3B8 !important;
-        }
-        div[data-testid="stTextInput"] div[data-baseweb="input"] {
-            background-color: #FFFFFF !important;
-        }
-        /* Clean Light Mode Look for Selectboxes and Options Dropdowns */
-        div[role="listbox"], div[data-testid="stSelectbox"] div {
-            background-color: #FFFFFF !important;
-            color: #0F172A !important;
-        }
-        /* Main Segmented Control Button Color Fix */
-        button[data-testid="stBaseButton-secondaryFormSubmit"], 
-        div[data-testid="stHorizontalBlock"] button,
-        .st-emotion-cache-12fmju2 {
-            background-color: #E2E8F0 !important;
-            color: #0F172A !important;
-        }
+        section[data-testid="stSidebar"] { background-color: #FFFFFF !important; border-right: 1px solid #E2E8F0 !important; }
+        h1, h2, h3, h4, h5, h6, p, label, span, div, .stMarkdown p { color: #0F172A !important; }
+        input { background-color: #FFFFFF !important; color: #0F172A !important; border: 1px solid #94A3B8 !important; }
+        div[data-testid="stTextInput"] div[data-baseweb="input"] { background-color: #FFFFFF !important; }
+        div[role="listbox"], div[data-testid="stSelectbox"] div { background-color: #FFFFFF !important; color: #0F172A !important; }
         </style>
         """, unsafe_allow_html=True)
     brand_autocad = "#DC2626"
@@ -162,18 +120,26 @@ for entry in commands_db:
         })
 
 # ==========================================
-# 5. MAIN PAGE INTERFACE & ROW SELECTORS
+# 5. MAIN PAGE INTERFACE & WORKSPACE TABS
 # ==========================================
 st.title("📐 CADD CORE ENGINE")
 st.caption("Instant Engine Autocomplete Reference")
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Main page workspace tabs
-software_choice = st.segmented_control(
-    "Select Subsystem Workspace Mode:",
-    ["All Systems", "AutoCAD Engine", "SolidWorks Engine"],
-    default="All Systems"
-)
+# Replacing the buggy segmented control bar with high-contrast native layout columns!
+st.markdown("##### 🖥️ Filter CAD Subsystem")
+c1, c2, c3 = st.columns(3)
+with c1:
+    btn_all = st.button("🌐 All Systems", use_container_width=True, type="secondary" if st.session_state.get("subsystem", "All Systems") != "All Systems" else "primary")
+    if btn_all: st.session_state["subsystem"] = "All Systems"
+with c2:
+    btn_cad = st.button("❤️ AutoCAD Engine", use_container_width=True, type="primary" if st.session_state.get("subsystem", "All Systems") == "AutoCAD Engine" else "secondary")
+    if btn_cad: st.session_state["subsystem"] = "AutoCAD Engine"
+with c3:
+    btn_sw = st.button("💙 SolidWorks Engine", use_container_width=True, type="primary" if st.session_state.get("subsystem", "All Systems") == "SolidWorks Engine" else "secondary")
+    if btn_sw: st.session_state["subsystem"] = "SolidWorks Engine"
+
+software_choice = st.session_state.get("subsystem", "All Systems")
 st.markdown("<br>", unsafe_allow_html=True)
 
 search_query = st.text_input("🔍 Search Command Registry:", "").strip().lower()
@@ -197,7 +163,7 @@ if search_query:
             suggestions.append((label, cmd))
 
 # ==========================================
-# 6. HIGH-CONTRAST DATA CONTAINER VIEW
+# 6. FIXED CONTAINER VIEW
 # ==========================================
 if search_query:
     if suggestions:
