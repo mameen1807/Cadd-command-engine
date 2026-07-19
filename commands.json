@@ -1,0 +1,157 @@
+[
+  {
+    "software": "AutoCAD",
+    "name": "LINE (L)",
+    "use": "Creates straight line segments between two points. The base tool for almost all 2D layouts."
+  },
+  {
+    "software": "AutoCAD",
+    "name": "CIRCLE (C)",
+    "use": "Creates a circle using a center point and a radius or diameter value."
+  },
+  {
+    "software": "AutoCAD",
+    "name": "RECTANGLE (REC)",
+    "use": "Creates a rectangular polyline after defining two diagonal corners."
+  },
+  {
+    "software": "AutoCAD",
+    "name": "FILLET (F)",
+    "use": "Rounds and fillets the edges of objects, creating a smooth curved corner between two intersecting lines."
+  },
+  {
+    "software": "AutoCAD",
+    "name": "CHAMFER (CHA)",
+    "use": "Bevels or cuts a sharp flat angled edge between two intersecting lines instead of rounding it."
+  },
+  {
+    "software": "AutoCAD",
+    "name": "TRIM (TR)",
+    "use": "Cuts or trims objects to precisely meet the cutting edges of other intersecting objects. Great for cleaning up messy intersections."
+  },
+  {
+    "software": "AutoCAD",
+    "name": "EXTEND (EX)",
+    "use": "Lengthens a line, arc, or open polyline so that it perfectly meets the boundary edge of another object."
+  },
+  {
+    "software": "AutoCAD",
+    "name": "OFFSET (O)",
+    "use": "Creates concentric circles, parallel lines, or parallel curves at a specific distance from the original object."
+  },
+  {
+    "software": "AutoCAD",
+    "name": "MIRROR (MI)",
+    "use": "Creates a perfectly flipped, mirrored copy of selected geometry across a designated symmetry axis line."
+  },
+  {
+    "software": "AutoCAD",
+    "name": "MOVE (M)",
+    "use": "Displaces objects a specified distance in a specified direction from a base point."
+  },
+  {
+    "software": "AutoCAD",
+    "name": "COPY (CO)",
+    "use": "Duplicates selected objects and places the copies at specified distance and direction intervals."
+  },
+  {
+    "software": "AutoCAD",
+    "name": "ROTATE (RO)",
+    "use": "Turns selected objects around a fixed base point by a specified angular value."
+  },
+  {
+    "software": "AutoCAD",
+    "name": "SCALE (SC)",
+    "use": "Enlarges or reduces the uniform size of selected objects equally in all directions while keeping proportions."
+  },
+  {
+    "software": "AutoCAD",
+    "name": "EXPLODE (X)",
+    "use": "Breaks a compound object (like a rectangle, block, or polyline) down into its individual, basic component lines or arcs."
+  },
+  {
+    "software": "AutoCAD",
+    "name": "JOIN (J)",
+    "use": "Combines a series of individual linear or curved segments that touch endpoints into a single, unified object."
+  },
+  {
+    "software": "SolidWorks",
+    "name": "Extruded Boss/Base",
+    "use": "Takes a 2D closed sketch profile and pushes it linearly into a 3D solid feature, adding thickness or depth."
+  },
+  {
+    "software": "SolidWorks",
+    "name": "Extruded Cut",
+    "use": "Cuts into or completely removes material from an existing 3D solid model by pushing a 2D sketch profile straight through it."
+  },
+  {
+    "software": "SolidWorks",
+    "name": "Revolved Boss/Base",
+    "use": "Rotates a 2D sketch profile around a central centerline axis to create a 3D symmetrical solid shape like a wheel, shaft, or sphere."
+  },
+  {
+    "software": "SolidWorks",
+    "name": "Revolved Cut",
+    "use": "Removes material from a 3D part by rotating a closed sketch profile around a central centerline axis to gouge out symmetric channels."
+  },
+  {
+    "software": "SolidWorks",
+    "name": "Swept Boss/Base",
+    "use": "Extrudes a 2D profile sketch along a customized, curved 2D or 3D sketch path line. Perfect for pipes, wires, or springs."
+  },
+  {
+    "software": "SolidWorks",
+    "name": "Lofted Boss/Base",
+    "use": "Blends multiple distinct 2D sketch profiles on separate parallel planes together into a single smooth 3D shape. Used for organic shapes like car bodies or turbine blades."
+  },
+  {
+    "software": "SolidWorks",
+    "name": "Fillet",
+    "use": "Creates a rounded internal or external face on a 3D solid part along selected straight or curved model edges."
+  },
+  {
+    "software": "SolidWorks",
+    "name": "Chamfer",
+    "use": "Bevels a sharp 3D model edge by cutting it at a flat angle, defining the look by angle-distance or distance-distance values."
+  },
+  {
+    "software": "SolidWorks",
+    "name": "Linear Pattern",
+    "use": "Creates multiple repeating copies of a 3D feature or face arrayed in one or two straight directional paths."
+  },
+  {
+    "software": "SolidWorks",
+    "name": "Circular Pattern",
+    "use": "Creates multiple repeating copies of a 3D feature arrayed evenly or at specific angles around a central axis line."
+  },
+  {
+    "software": "SolidWorks",
+    "name": "Shell",
+    "use": "Hollows out a solid 3D part, leaving selected faces open and creating thin uniform walls on all remaining sides. Perfect for plastic enclosures."
+  },
+  {
+    "software": "SolidWorks",
+    "name": "Rib",
+    "use": "Adds a thin, structural support wall to a 3D model from an open 2D sketch line, usually to reinforce corners or hollow parts."
+  },
+  {
+    "software": "SolidWorks",
+    "name": "Smart Dimension",
+    "use": "The universal sketching tool used to define the exact length, radius, angle, or distance constraints of geometry inside a 2D sketch environment."
+  },
+  {
+    "software": "SolidWorks",
+    "name": "Straight Slot",
+    "use": "Creates a straight slot feature based on a center line sketch path and a defined width constraint."
+  },
+  {
+    "software": "SolidWorks",
+    "name": "Line",
+    "use": "Draws straight line segments contextually inside a 2D sketch profile. The fundamental starting element for most features."
+  },
+  {
+    "software": "SolidWorks",
+    "name": "Straight Slot",
+    "use": "Creates a straight slot feature based on a center line sketch path and a defined width constraint."
+  }
+]
