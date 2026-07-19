@@ -3,7 +3,7 @@ import json
 import re
 
 # ==========================================
-# 1. CORE WEBAPP PAGE SETUP & INJECTIONS
+# 1. CORE WEBAPP PAGE SETUP & SAFETY HOOKS
 # ==========================================
 st.set_page_config(
     page_title="CADD Core | Reference Engine",
@@ -12,9 +12,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Complete styling hammer:
-# 1. Blocks Ctrl+C cache interrupts completely.
-# 2. Obliterates the text anchor symbols using every known element tag variant.
+# Kills Ctrl+C cache interrupts AND violently strips away the hover link symbols (#)
 st.markdown("""
 <script>
 window.addEventListener('keydown', function(e) {
@@ -25,11 +23,12 @@ window.addEventListener('keydown', function(e) {
 }, true);
 </script>
 <style>
-/* Aggressive annihilation of the hover link symbols (#) */
+/* Absolute annihilation of the hover link symbols and their interactive SVG wrappers */
 .element-hover-anchor, 
 a.element-hover-anchor, 
 [data-testid="stHeaderActionElements"] a,
-h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a,
+svg.element-hover-anchor {
     display: none !important;
     visibility: hidden !important;
     opacity: 0 !important;
@@ -49,29 +48,81 @@ with st.sidebar:
         ["Dark Matte Studio", "Drafting Light Mode"]
     )
 
-# Clean, safe background grid rendering that leaves text elements untouched
+# ==========================================
+# 3. ADVANCED FORCE-THEMING STYLE OVERRIDES
+# ==========================================
 if ui_theme == "Dark Matte Studio":
     st.markdown("""
         <style>
+        /* Base Page Background Grid */
         .stApp {
             background-color: #0D0F12 !important;
             background-image: linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 0),
                               linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 0) !important;
             background-size: 32px 32px !important;
         }
+        /* Sidebar thematic color lock down */
+        section[data-testid="stSidebar"] {
+            background-color: #11141B !important;
+        }
+        /* Global Text Color Control */
+        h1, h2, h3, h4, h5, h6, p, label, span, div {
+            color: #E2E8F0 !important;
+        }
+        /* Input Field Overrides */
+        input {
+            background-color: #151922 !important;
+            color: #E2E8F0 !important;
+            border: 1px solid #222936 !important;
+        }
+        /* Segmented Controller Theme Fix */
+        div[data-testid="stHorizontalBlock"] button {
+            background-color: #151922 !important;
+            color: #E2E8F0 !important;
+        }
         </style>
         """, unsafe_allow_html=True)
     brand_autocad = "#EF4444"
     brand_solidworks = "#3B82F6"
 else:
-    # High-contrast light layout that preserves natural input field text colors
     st.markdown("""
         <style>
+        /* Base Light Grid Canvas Background */
         .stApp {
             background-color: #F8FAFC !important;
             background-image: linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 0),
                               linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 0) !important;
             background-size: 24px 24px !important;
+        }
+        /* Clean Light Sidebar Canvas Lock */
+        section[data-testid="stSidebar"] {
+            background-color: #FFFFFF !important;
+            border-right: 1px solid #E2E8F0 !important;
+        }
+        /* Global High Contrast Text Color Force */
+        h1, h2, h3, h4, h5, h6, p, label, span, div, .stMarkdown p {
+            color: #0F172A !important;
+        }
+        /* Clear Input Field Box Shadows & Bright Text Visibility Override */
+        input {
+            background-color: #FFFFFF !important;
+            color: #0F172A !important;
+            border: 1px solid #94A3B8 !important;
+        }
+        div[data-testid="stTextInput"] div[data-baseweb="input"] {
+            background-color: #FFFFFF !important;
+        }
+        /* Clean Light Mode Look for Selectboxes and Options Dropdowns */
+        div[role="listbox"], div[data-testid="stSelectbox"] div {
+            background-color: #FFFFFF !important;
+            color: #0F172A !important;
+        }
+        /* Main Segmented Control Button Color Fix */
+        button[data-testid="stBaseButton-secondaryFormSubmit"], 
+        div[data-testid="stHorizontalBlock"] button,
+        .st-emotion-cache-12fmju2 {
+            background-color: #E2E8F0 !important;
+            color: #0F172A !important;
         }
         </style>
         """, unsafe_allow_html=True)
@@ -79,7 +130,7 @@ else:
     brand_solidworks = "#2563EB"
 
 # ==========================================
-# 3. DATABASE CONFIGURATION
+# 4. DATABASE CONFIGURATION
 # ==========================================
 try:
     with open("commands.json", "r") as f:
@@ -111,13 +162,13 @@ for entry in commands_db:
         })
 
 # ==========================================
-# 4. MAIN PAGE INTERFACE & ROW SELECTORS
+# 5. MAIN PAGE INTERFACE & ROW SELECTORS
 # ==========================================
 st.title("📐 CADD CORE ENGINE")
 st.caption("Instant Engine Autocomplete Reference")
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Central filter bar
+# Main page workspace tabs
 software_choice = st.segmented_control(
     "Select Subsystem Workspace Mode:",
     ["All Systems", "AutoCAD Engine", "SolidWorks Engine"],
@@ -146,7 +197,7 @@ if search_query:
             suggestions.append((label, cmd))
 
 # ==========================================
-# 5. HIGH-CONTRAST DATA CONTAINER VIEW
+# 6. HIGH-CONTRAST DATA CONTAINER VIEW
 # ==========================================
 if search_query:
     if suggestions:
@@ -159,7 +210,6 @@ if search_query:
         active_color = brand_autocad if selected_cmd["software"] == "AutoCAD" else brand_solidworks
         icon_initials = "".join([word[0] for word in selected_cmd["name"].split()[:2]]).upper()
 
-        # Renders the card natively without complex tables, making text beautifully readable across light/dark profiles
         with st.container(border=True):
             col_icon, col_meta, col_key = st.columns([1, 4, 2])
             
